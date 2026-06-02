@@ -7,7 +7,7 @@
 // 1. CONFIGURATION
 // ─────────────────────────────────────────────
 const CONFIG = {
-  GROQ_API_KEY: '', // 🔑 Add your key here for local dev only — remove before committing
+  GROQ_API_KEY: 'YOUR_GROQ_API_KEY_HERE', // 🔑 Paste your key here for local dev — get one free at console.groq.com
   MODEL: 'llama-3.3-70b-versatile',
   END_HOUR: 23,   // 11 PM
   END_MIN: 0,
