@@ -40,6 +40,12 @@ async function planDay() {
   loading.style.display = 'flex';
   content.classList.add('hidden');
 
+  // Guard: no API key in local dev
+  if (IS_LOCAL && !CONFIG.GROQ_API_KEY) {
+    loading.innerHTML = '<p style="color:var(--yellow);margin:auto;">⚠️ Add your Groq API key to <code>CONFIG.GROQ_API_KEY</code> in app.js for local dev.</p>';
+    return;
+  }
+
   const today   = todayISO();
   const pending = state.tasks.filter(t => t.status === 'pending' && (!t.dueDate || t.dueDate === today));
 
