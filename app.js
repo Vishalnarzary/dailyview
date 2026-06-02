@@ -684,13 +684,9 @@ async function init() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Attach login/plan/history events FIRST (before auth check)
+  // Attach plan/history events
   if (typeof attachFeatureEvents === 'function') attachFeatureEvents();
 
-  // Check auth — only init if logged in
-  if (typeof checkAuth === 'function') {
-    if (checkAuth()) init();
-  } else {
-    init();
-  }
+  // No login — init directly
+  init();
 });
