@@ -6,53 +6,7 @@
 // ─── ENV DETECT ───
 const IS_LOCAL = ['localhost', '127.0.0.1', ''].includes(window.location.hostname);
 
-// ─────────────────────────────────────────────
-// LOGIN
-// ─────────────────────────────────────────────
-const LOCAL_PASSWORD = 'dayflow123';
-
-function checkAuth() {
-  if (localStorage.getItem('dayflow_token')) {
-    document.getElementById('login-screen').classList.add('hidden');
-    document.getElementById('app').style.display = '';
-    return true;
-  }
-  document.getElementById('login-screen').classList.remove('hidden');
-  document.getElementById('app').style.display = 'none';
-  return false;
-}
-
-async function doLogin(password) {
-  if (IS_LOCAL) {
-    if (password === LOCAL_PASSWORD) { loginSuccess(); return; }
-    document.getElementById('login-error').textContent = 'Wrong password. Default: dayflow123';
-    return;
-  }
-  try {
-    const r = await fetch('/api/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ password }),
-    });
-    const data = await r.json();
-    if (data.success) loginSuccess();
-    else document.getElementById('login-error').textContent = data.error || 'Invalid password';
-  } catch {
-    document.getElementById('login-error').textContent = 'Server error. Try again.';
-  }
-}
-
-function loginSuccess() {
-  localStorage.setItem('dayflow_token', Date.now().toString());
-  document.getElementById('login-screen').classList.add('hidden');
-  document.getElementById('app').style.display = '';
-  if (typeof init === 'function') init();
-}
-
-function doLogout() {
-  localStorage.removeItem('dayflow_token');
-  location.reload();
-}
+// Login removed — app loads directly
 
 // ─────────────────────────────────────────────
 // PLAN THE DAY
@@ -310,13 +264,6 @@ function toggleHistoryTasks(btn) {
 // ATTACH ALL EVENTS
 // ─────────────────────────────────────────────
 function attachFeatureEvents() {
-  // Login
-  document.getElementById('login-form').addEventListener('submit', e => {
-    e.preventDefault();
-    doLogin(document.getElementById('login-password').value);
-  });
-  document.getElementById('logout-btn').addEventListener('click', doLogout);
-
   // Plan Day
   document.getElementById('plan-btn').addEventListener('click', planDay);
   document.getElementById('close-plan').addEventListener('click', () =>
