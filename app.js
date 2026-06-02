@@ -98,7 +98,7 @@ Keep greeting under 60 words. Use a real attributed quote.`;
 // ─────────────────────────────────────────────
 // 6. GROQ API (with Vercel proxy support)
 // ─────────────────────────────────────────────
-const IS_LOCAL = ['localhost','127.0.0.1',''].includes(window.location.hostname);
+// IS_LOCAL is declared in features.js (loaded first)
 
 async function callGroq(systemPrompt, userMessage, parseJSON = true) {
   let resp;
@@ -149,8 +149,8 @@ async function callGroq(systemPrompt, userMessage, parseJSON = true) {
 // ─────────────────────────────────────────────
 async function processCommand(rawText) {
   if (!rawText.trim()) { showToast('Please say or type a command first.', 'warn'); return; }
-  if (CONFIG.GROQ_API_KEY === 'YOUR_GROQ_API_KEY_HERE') {
-    showToast('⚠️ Set your Groq API key in app.js (CONFIG.GROQ_API_KEY)', 'error');
+  if (IS_LOCAL && !CONFIG.GROQ_API_KEY) {
+    showToast('⚠️ Add your Groq API key to CONFIG.GROQ_API_KEY in app.js for local dev', 'error');
     return;
   }
 
@@ -196,10 +196,10 @@ async function loadCoach() {
   el.textContent = 'Loading your daily briefing...';
   qEl.textContent = '';
 
-  if (CONFIG.GROQ_API_KEY === 'YOUR_GROQ_API_KEY_HERE') {
+  if (IS_LOCAL && !CONFIG.GROQ_API_KEY) {
     el.textContent = state.coachMode === 'coach'
-      ? "Welcome back! Set your Groq API key to get personalized coaching. Let's make today count! 💪"
-      : "No API key, no excuses. Set CONFIG.GROQ_API_KEY and get moving.";
+      ? "Welcome back! Add your Groq API key to app.js for personalized coaching. Let's make today count! 💪"
+      : "No API key, no excuses. Add CONFIG.GROQ_API_KEY in app.js and get moving.";
     qEl.textContent = '"The secret of getting ahead is getting started." — Mark Twain';
     return;
   }
