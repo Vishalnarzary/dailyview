@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="DayFlow — Voice-powered AI daily planner with 11 PM deadline tracker">
+  <title>DayFlow — AI Daily Planner</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ── LOGIN SCREEN ── -->
+  <div id="login-screen" class="login-screen hidden">
+    <div class="login-card glass">
+      <span class="login-logo">⚡</span>
+      <h1 class="login-title">DayFlow</h1>
+      <p class="login-sub">Your AI-Powered Daily Planner</p>
+      <form id="login-form" autocomplete="off">
+        <input type="password" id="login-password" placeholder="Enter your password" class="login-input" required>
+        <button type="submit" class="btn btn-primary login-submit">🔓 Unlock</button>
+      </form>
+      <p id="login-error" class="login-error"></p>
+    </div>
+  </div>
+
+  <!-- ── FOCUS MODE OVERLAY ── -->
+  <div id="focus-overlay" class="hidden">
+    <button id="exit-focus-btn" class="exit-focus-btn">✕ Exit Focus</button>
+    <div class="focus-content">
+      <div class="focus-label">FOCUS MODE</div>
+      <div id="focus-timer" class="focus-timer">--:--</div>
+      <div class="focus-divider"></div>
+      <p class="focus-task-label">Your One Thing Right Now</p>
+      <div id="focus-task-text" class="focus-task-text">No tasks yet</div>
+    </div>
+  </div>
+
+  <!-- ── TIME REALITY MODAL ── -->
+  <div id="time-modal" class="modal-backdrop hidden">
+    <div class="modal glass">
+      <div class="modal-icon">⏰</div>
+      <h3>Time Reality Check</h3>
+      <p id="modal-msg"></p>
+      <div class="modal-btns">
+        <button id="modal-dismiss" class="btn btn-ghost">I'll manage it</button>
+        <button id="modal-push" class="btn btn-primary">Move overflow to tomorrow</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── PLAN MODAL ── -->
+  <div id="plan-modal" class="modal-backdrop hidden">
+    <div class="plan-container glass">
+      <div class="plan-header">
+        <h2>📅 Your Day Plan</h2>
+        <button id="close-plan" class="btn btn-icon">✕</button>
+      </div>
+      <div id="plan-loading" class="plan-loading">
+        <div class="spinner"></div>
+        <p>Creating your balanced schedule...</p>
+      </div>
+      <div id="plan-content" class="hidden">
+        <div id="plan-summary" class="plan-summary"></div>
+        <div id="plan-timeline" class="plan-timeline"></div>
+        <div id="plan-tips" class="plan-tips"></div>
+      </div>
+      <div class="plan-footer">
+        <button id="regenerate-plan" class="btn btn-ghost">🔄 Regenerate</button>
+        <button id="close-plan-bottom" class="btn btn-primary">Got it!</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── HISTORY MODAL ── -->
+  <div id="history-modal" class="modal-backdrop hidden">
+    <div class="history-container glass">
+      <div class="history-header">
+        <h2>📊 Task History</h2>
+        <div class="history-actions">
+          <button id="archive-now" class="btn btn-ghost">💾 Archive Today</button>
+          <button id="close-history" class="btn btn-icon">✕</button>
+        </div>
+      </div>
+      <div id="history-list" class="history-list"></div>
+      <div id="empty-history" class="empty-state">
+        <span>📭</span>
+        <p>No history yet. Complete a day to see it here!</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── LOADING OVERLAY ── -->
+  <div id="loading-overlay" class="hidden">
+    <div class="spinner"></div>
+    <p id="loading-text">Thinking...</p>
+  </div>
+
+  <!-- ══════════════ MAIN APP ══════════════ -->
+  <div id="app">
+
+    <!-- HEADER -->
+    <header id="main-header">
+      <div class="brand">
+        <span class="brand-icon">⚡</span>
+        <span class="brand-name">DayFlow</span>
+      </div>
+      <nav class="header-nav">
+        <button id="plan-btn" class="btn btn-pill">📅 Plan Day</button>
+        <button id="history-btn" class="btn btn-pill">📊 History</button>
+        <button id="coach-toggle" class="btn btn-pill" title="Toggle coach personality">
+          <span id="coach-icon">🧠</span>
+          <span id="coach-label">Coach</span>
+        </button>
+        <button id="focus-btn" class="btn btn-pill">🎯 Focus</button>
+        <button id="logout-btn" class="btn btn-pill">🚪</button>
+      </nav>
+    </header>
+
+    <!-- COACH CARD -->
+    <section id="coach-section">
+      <div id="coach-card" class="glass coach-card">
+        <span class="coach-avatar" id="coach-avatar">🤖</span>
+        <div class="coach-body">
+          <p id="coach-greeting">Loading your daily briefing...</p>
+          <p id="coach-quote" class="coach-quote"></p>
+        </div>
+        <button id="refresh-coach" class="btn btn-icon" title="Refresh">↻</button>
+      </div>
+    </section>
+
+    <!-- COUNTDOWN + STATS -->
+    <section id="hero">
+      <div id="countdown-card" class="glass countdown-card">
+        <p class="cd-label">Time Until 11 PM</p>
+        <div id="cd-display">
+          <div class="cd-unit"><span id="cd-h" class="cd-num">--</span><span class="cd-sub">hrs</span></div>
+          <span class="cd-sep">:</span>
+          <div class="cd-unit"><span id="cd-m" class="cd-num">--</span><span class="cd-sub">min</span></div>
+          <span class="cd-sep">:</span>
+          <div class="cd-unit"><span id="cd-s" class="cd-num">--</span><span class="cd-sub">sec</span></div>
+        </div>
+        <div id="cd-status" class="cd-status"></div>
+        <div id="streak-badge" class="streak-badge">🔥 <span id="streak-num">0</span> day streak</div>
+      </div>
+      <div id="stats-grid">
+        <div class="stat glass"><span class="stat-icon">📋</span><span id="s-total" class="stat-val">0</span><span class="stat-lbl">Total</span></div>
+        <div class="stat glass"><span class="stat-icon">✅</span><span id="s-done" class="stat-val">0</span><span class="stat-lbl">Done</span></div>
+        <div class="stat glass"><span class="stat-icon">⏳</span><span id="s-pending" class="stat-val">0</span><span class="stat-lbl">Pending</span></div>
+        <div class="stat glass progress-stat">
+          <div class="ring-wrap">
+            <svg viewBox="0 0 100 100" class="ring-svg">
+              <circle class="ring-bg" cx="50" cy="50" r="38"/>
+              <circle class="ring-fill" id="ring-circle" cx="50" cy="50" r="38"/>
+            </svg>
+            <span id="ring-pct" class="ring-pct">0%</span>
+          </div>
+          <span class="stat-lbl">Complete</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- VOICE INPUT -->
+    <section id="voice-section" class="glass">
+      <div class="voice-top">
+        <h2>🎙️ Voice Command</h2>
+        <span id="voice-status" class="voice-status">Ready</span>
+      </div>
+      <div class="voice-body">
+        <button id="mic-btn" class="mic-btn" title="Start recording">
+          <span class="mic-emoji">🎤</span>
+          <span class="mic-ring r1"></span>
+          <span class="mic-ring r2"></span>
+          <span class="mic-ring r3"></span>
+        </button>
+        <textarea id="transcript" class="transcript" rows="4"
+          placeholder="Click 🎤 to speak, or type here...&#10;&#10;Examples:&#10;• 'Add buy groceries and call mom'&#10;• 'Mark email team as done'&#10;• 'Push all coding tasks to tomorrow'"></textarea>
+      </div>
+      <div class="voice-footer">
+        <button id="clear-btn" class="btn btn-ghost">Clear</button>
+        <button id="process-btn" class="btn btn-primary">⚡ Process</button>
+      </div>
+    </section>
+
+    <!-- TASKS + TADA -->
+    <div id="lists-row">
+      <section id="pending-section" class="glass task-col">
+        <div class="col-header"><h2>📋 Today's Tasks</h2><span id="pending-count" class="count-badge">0</span></div>
+        <div id="pending-list"></div>
+        <div id="empty-pending" class="empty-state"><span>🎉</span><p>All clear! Add tasks above.</p></div>
+      </section>
+      <section id="tada-section" class="glass task-col">
+        <div class="col-header"><h2>🏆 Ta-Da! Conquered</h2><span id="done-count" class="count-badge done-badge">0</span></div>
+        <div id="tada-list"></div>
+        <div id="empty-tada" class="empty-state"><span>💪</span><p>Complete tasks to see them here!</p></div>
+      </section>
+    </div>
+
+  </div>
+
+  <script src="features.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
